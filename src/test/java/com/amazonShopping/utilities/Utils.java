@@ -67,9 +67,8 @@ public abstract class Utils {
     
     public static void verifyText(WebElement element, String textToBeVerified) {
     
-        boolean isVerified = element.getText().equalsIgnoreCase(textToBeVerified);
         
-        Assert.assertTrue(textToBeVerified+" not equal", isVerified);
+        Assert.assertEquals(textToBeVerified+" not equal", element.getText(),textToBeVerified);
         
     }
     
@@ -84,9 +83,8 @@ public abstract class Utils {
             e.printStackTrace();
         }
     
-        boolean isVerified = element.getText().equalsIgnoreCase(textToBeVerified);
         
-        Assert.assertTrue(textToBeVerified+" not equal", isVerified);
+        Assert.assertEquals(textToBeVerified+" not equal", element.getText(),textToBeVerified);
     
     }
     
