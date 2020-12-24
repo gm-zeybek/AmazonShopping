@@ -1,3 +1,4 @@
 target/
 .idea/
 EU2CucumberSelenium.iml
+.DS_Store
