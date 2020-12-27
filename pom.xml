@@ -42,11 +42,7 @@
             <version>6.9.1</version>
             <scope>test</scope>
         </dependency>
-        <dependency>
-            <groupId>org.testng</groupId>
-            <artifactId>testng</artifactId>
-            <version>7.3.0</version>
-        </dependency>
+
     </dependencies>
 
     <build>

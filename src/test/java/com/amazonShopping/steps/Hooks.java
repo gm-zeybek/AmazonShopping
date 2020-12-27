@@ -17,7 +17,9 @@ public class Hooks {
     @Before
     public void setUp(){
     
+        // navigating the url
         Driver.get().get(ConfigurationReader.get("url"));
+        // accepting cookies
         Utils.waitFor().until(ExpectedConditions.presenceOfElementLocated(By.cssSelector("#sp-cc-accept"))).click();
     }
     
@@ -25,10 +27,12 @@ public class Hooks {
     public void tearDown(Scenario scenario){
         if (scenario.isFailed()){
 
+            // taking screenshot
             final byte[] screenshot = ((TakesScreenshot) Driver.get()).getScreenshotAs(OutputType.BYTES);
             scenario.attach(screenshot,"image/png","screenshot");
         }
         
+        // closing session
        Driver.closeDriver();
     }
     

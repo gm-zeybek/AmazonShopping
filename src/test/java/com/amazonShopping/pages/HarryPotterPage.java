@@ -1,24 +1,22 @@
 package com.amazonShopping.pages;
 
 import com.amazonShopping.utilities.Driver;
+import com.amazonShopping.utilities.Utils;
+import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.PageFactory;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 
 public class HarryPotterPage {
     
     
-    @FindBy(xpath = "//div[4]//span//div[1]//img[1]")
-    public WebElement foundResult;
-    
     
     @FindBy(id = "a-page")
     public WebElement loaderMaskElement2;
-    
-    @FindBy(css = ".a-aui_72554-c")
-    public WebElement loaderMaskElement3;
     
     @FindBy(xpath = "//span[@class='cat-name']")
     public WebElement bestSellerTag;
@@ -26,11 +24,14 @@ public class HarryPotterPage {
     @FindBy(xpath = "//div[2]//h2[1]//span[1]")
     public List<WebElement> bookLinksElement;
     
-    @FindBy(xpath = "//*[@id=\"detailBullets_feature_div\"]/ul//span[2]")
-    public List<WebElement> bookInfoElementList;
-    
     @FindBy(xpath = "//*[@id=\"authorFollow_feature_div\"]/div[1]/div[2]/a")
     public WebElement authorNameTag;
+    
+    @FindBy(xpath = "//*[.='9 - 11 years']/../../div[3]/span")
+    public WebElement readingAge;
+    
+    @FindBy(xpath = "//*[.='352 pages']/../../div[3]/span")
+    public WebElement printLength;
     
     @FindBy(xpath = "//*[@id=\"showMoreFormatsPrompt\"]")
     public WebElement allEditionFormatsLink;
@@ -53,8 +54,57 @@ public class HarryPotterPage {
     @FindBy(xpath = "//*[@id=\"ap_register_form\"]/div//label")
     public List<WebElement> creatAccountLabels;
     
-    @FindBy(xpath = "//*[@id=\"ap_register_form\"]/div//input")
-    public List<WebElement> creatAccountInputBoxes;
+    
+    
+    public static WebElement getBookFeature(Feature feature) {
+    
+        WebElement element = null;
+        try {
+        
+        
+               element = Utils.waitFor().until(ExpectedConditions.presenceOfElementLocated(By.xpath("//*[.='" + FeatureMathcher(feature) +
+                "']/../." +
+                "./div[3]/span")));
+        }catch (NoSuchElementException e){
+    
+            e.printStackTrace();
+        }
+       return element;
+    }
+    
+    public static String FeatureMathcher(Feature feature) {
+        
+        switch (feature) {
+            case AGE:
+                return "Reading age";
+            case LENGTH:
+                return "Print length";
+            case LANGUAGE:
+                return "Language:";
+            case DIMENSIONS:
+                return "Dimensions";
+            case PUBLISHER:
+                return "Publisher";
+            case DATE:
+                return "Publication date";
+            case ISBN10:
+                return "ISBN-10";
+            case ISBN13:
+                return "ISBN-13";
+        }
+        return null;
+    }
+    public enum Feature {
+        AGE,
+        LENGTH,
+        LANGUAGE,
+        DIMENSIONS,
+        PUBLISHER,
+        DATE,
+        ISBN10,
+        ISBN13,
+    }
+    
     
     public String selectBoxEndPoint ="https://www.amazon.co.uk/Harry-Potter-Philosophers-Stone/dp/1408855658/ref" +
         "=sr_1_1?dchild=1&keywords" +

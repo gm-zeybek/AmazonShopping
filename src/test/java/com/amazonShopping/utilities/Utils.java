@@ -13,7 +13,6 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.time.Duration;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 public abstract class Utils {
     
@@ -37,44 +36,64 @@ public abstract class Utils {
     }
     
     
+    /**
+     * wait method
+     * @return
+     */
     public static FluentWait<WebDriver> waitFor() {
-        WebDriver driver;
-        return new WebDriverWait(Driver.get(), 15).withTimeout(5, TimeUnit.SECONDS);
+       
+        return new WebDriverWait(Driver.get(), 20);
     }
     
     
-    
+    /**
+     * taking webelement as an argument and return clickable element
+     * @param element
+     * @return
+     */
     public static WebElement getElementWithFluentWait(WebElement element) {
         return Utils.waitFor().withTimeout(Duration.ofSeconds(5)).
                 until(ExpectedConditions.elementToBeClickable(element));
         
     }
+    
+    /**
+     * moveto method taking webelement and returning Actions instance
+     * @param element
+     * @return
+     */
     public static Actions moveToElement(WebElement element) {
         return new Actions(Driver.get()).
-        moveToElement(element);
+                moveToElement(element);
         
     }
     
     
-    
+    /**
+     * Selecting dropdown by given word and verifying selected word
+     * selected or not
+     * @param selectElement
+     * @param category
+     */
     public static void verifyThatCategorySelected(WebElement selectElement, String category) {
         Select select = new Select(selectElement);
         select.selectByVisibleText(category);
         String selectedCategory = select.getFirstSelectedOption().getText();
-        Assert.assertEquals(category+" wasn't selected", selectedCategory, category);
+        Assert.assertEquals(category + " wasn't selected", selectedCategory, category);
         
     }
     
-    public static void verifyText(WebElement element, String textToBeVerified) {
     
+    public static void verifyText(WebElement element, String textToBeVerified) {
         
-        Assert.assertEquals(textToBeVerified+" not equal", element.getText(),textToBeVerified);
+        
+        Assert.assertEquals(textToBeVerified + " not equal", element.getText(), textToBeVerified);
         
     }
     
     public static void verifyTextEntered(WebElement element, String textToBeVerified) {
-       
-       // waitFor().until(ExpectedConditions.elementSelectionStateToBe(element,true));
+        
+        // waitFor().until(ExpectedConditions.elementSelectionStateToBe(element,true));
         
         element.sendKeys(textToBeVerified, Keys.ENTER);
         try {
@@ -82,29 +101,29 @@ public abstract class Utils {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-    
         
-        Assert.assertEquals(textToBeVerified+" not equal", element.getText(),textToBeVerified);
-    
+        
+        Assert.assertEquals(textToBeVerified + " not equal", element.getText(), textToBeVerified);
+        
     }
-    
     
     
     public static WebElement getTheLink(String linkText) {
         try {
-        return Driver.get().findElement(By.
-                xpath("/html/body//a[contains(translate(.,'ABCDEFGHIJKLMNOPQRSTUVWXYZ','abcdefghijklmnopqrstuvwxyz')," +
-                        "'" + linkText.toLowerCase() + "')]"));
-    } catch (Exception e) {
-        e.printStackTrace();
-    }
+            return Driver.get().findElement(By.
+                    xpath("/html/body//a[contains(translate(.,'ABCDEFGHIJKLMNOPQRSTUVWXYZ'," +
+                            "'abcdefghijklmnopqrstuvwxyz')," +
+                            "'" + linkText.toLowerCase() + "')]"));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         return null;
-    
-}
+        
+    }
     
     public static WebElement getTheElement(String elementText) {
         try {
-        
+            
             return Driver.get().findElement(By.
                     xpath("/html/body//div[contains(translate(.,'ABCDEFGHIJKLMNOPQRSTUVWXYZ'," +
                             "'abcdefghijklmnopqrstuvwxyz')," +
@@ -116,47 +135,47 @@ public abstract class Utils {
     }
     
     public static WebElement getTheButton(String buttonText) {
-    
-        try {
         
+        try {
+            
             return Driver.get().findElement(By.
-                xpath("/html/body//input[contains(translate(@value,'ABCDEFGHIJKLMNOPQRSTUVWXYZ'," +
-                        "'abcdefghijklmnopqrstuvwxyz')," +
-                        "'" + buttonText.toLowerCase() + "')]"));
+                    xpath("/html/body//input[contains(translate(@value,'ABCDEFGHIJKLMNOPQRSTUVWXYZ'," +
+                            "'abcdefghijklmnopqrstuvwxyz')," +
+                            "'" + buttonText.toLowerCase() + "')]"));
         } catch (Exception e) {
             e.printStackTrace();
         }
         return null;
-    
+        
     }
     
     public static WebElement getPartialText(String tag, String buttonText) {
-    
-        try {
         
+        try {
+            
             return Driver.get().findElement(By.
-                xpath("/html/body//"+tag+"[contains(translate(@value,'ABCDEFGHIJKLMNOPQRSTUVWXYZ'," +
-                        "'abcdefghijklmnopqrstuvwxyz')," +
-                        "'" + buttonText.toLowerCase() + "')]"));
+                    xpath("/html/body//" + tag + "[contains(translate(@value,'ABCDEFGHIJKLMNOPQRSTUVWXYZ'," +
+                            "'abcdefghijklmnopqrstuvwxyz')," +
+                            "'" + buttonText.toLowerCase() + "')]"));
         } catch (Exception e) {
             e.printStackTrace();
         }
         return null;
-    
+        
     }
     
-    public static WebElement getTextFromListElement(List<WebElement> webElements,String text) {
-    
+    public static WebElement getTextFromListElement(List<WebElement> webElements, String text) {
+        
         try {
-        
-        
+            
+            
             List<WebElement> list = webElements;
             for (WebElement element : list) {
                 if (element.getText().contains(text)) {
                     return element;
                 }
             }
-           
+            
             
         } catch (Exception e) {
             e.printStackTrace();
