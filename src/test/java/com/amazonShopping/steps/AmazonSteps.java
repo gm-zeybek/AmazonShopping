@@ -1,114 +1,101 @@
 package com.amazonShopping.steps;
 
-import com.amazonShopping.pages.HarryPotterPage;
 import com.amazonShopping.pages.HomePage;
-import com.amazonShopping.utilities.BrowserUtils;
-import com.amazonShopping.utilities.Utils;
+
 import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
-import org.junit.Assert;
-import org.openqa.selenium.Keys;
-import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 
-import java.util.List;
+import static com.amazonShopping.utilities.Utils.*;
 
 
-public class AmazonSteps {
+public class AmazonSteps extends HomePage {
+    private String bookName;
+    
     @Given("Users should be able to select {string} options from drop down")
-    public void usersShouldBeAbleToSelectOptionsFromDropDown(String category) throws InterruptedException {
+    public void usersShouldBeAbleToSelectOptionsFromDropDown(String category) {
         
-        HomePage homePage = new HomePage();
         // selecting dropdown
-        WebElement selectDropdown = homePage.selectDropdown;
-        Utils.verifyThatCategorySelected(selectDropdown, category);
-        
+        verifyThatCategorySelected(selectDropdown, category);
         
     }
     
     @And("Search for the book named {string}")
     public void searchForTheBookNamed(String bookName) {
         
-        HomePage homePage = new HomePage();
+        // makes the local variable global
+        this.bookName = bookName;
         
-        // filtering
-        homePage.searchBox.sendKeys(Keys.CLEAR, bookName, Keys.ENTER);
-        try {
-            Thread.sleep(3000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        
-        // waiting for page loading
-        Utils.waitFor().until(ExpectedConditions.visibilityOf(homePage.loaderMaskElement1));
-        
-        // entering keyword
-        String acualString = homePage.searchResult.getText();
-        
-        // verifying entered is seen on the searchbox
-        Assert.assertEquals("search results are not matched", bookName, acualString.substring(1,
-                acualString.length() - 1));
+        // enters string and verifyies results are related to sought string
+        typeStringAndVerify(bookName, searchBox);
         
     }
     
     
-    @Then("Check if Book is a {string} or Not")
-    public void checkIfBookIsAOrNot(String bestSeller) throws InterruptedException {
-        HarryPotterPage hp = new HarryPotterPage();
-//         Driver.get().get(hp.selectBoxEndPoint);
-        String bookName = "Harry Potter and the Philosopher's Stone";
-        Utils.getElementWithFluentWait(hp.loaderMaskElement2);
+    @Then("Check if Book is a Best Seller or Not")
+    public void checkIfBookIsABestSellerOrNot() {
         
-        Thread.sleep(3000);
-        Utils.getTextFromListElement(hp.bookLinksElement, bookName).click();
+        // navigates to the book and wait for page loading
+        clickOnAndWaitForPageLoad(clickableBookImageElement,loaderMaskElement2);
         
-        Assert.assertEquals("Not best Seller", "#4 this week", hp.bestSellerTag.getText());
+        // verifies bestseller badge is shown up
+        verifyTextDisplayedAsExpected(bestSellerBadge,isDisplayed)
+                .withFailMessage("best seller badge is not shown up");
         
+    }
+    
+    
+    
+    @Then("Check if Book is available in the format of an Kindle Edition?")
+    public void checkIfBookIsAvailableInTheFormatOfAn() {
+        
+        moveToElement(allEditionFormatsLink).click();
+        
+        verifyTextDisplayedAsExpected((allEditionFormats).get(1),isDisplayed)
+                .withFailMessage("Kindle edition is not available");
+    
+        waitFor().until(ExpectedConditions.elementToBeClickable(hideButton)).click();
         
     }
     
     @And("Verify other author and book related information from the search page")
-    public void Verify_other_author_and_book_related_information_from_the_search_page() throws InterruptedException {
+    public void Verify_other_author_and_book_related_information_from_the_search_page() {
+        
+        moveToElement(authorNameTag);
+        
+        verifyTextDisplayedAsExpected(authorNameTag,isDisplayed)
+                .withFailMessage("author name is not displayed");
+        
+        moveToElement(ASINElement);
+        
+        verifyTextDisplayedAsExpected(bookRelatedItems.get(1),isDisplayed)
+                .withFailMessage("ASIN number is not displayed");
+        verifyTextDisplayedAsExpected(bookRelatedItems.get(2),isDisplayed)
+                .withFailMessage("PublisherInfo is not displayed");
+        verifyTextDisplayedAsExpected(bookRelatedItems.get(3),isDisplayed)
+                .withFailMessage("Language is not displayed");
+        verifyTextDisplayedAsExpected(bookRelatedItems.get(4),isDisplayed)
+                .withFailMessage("page number is not displayed");
+        verifyTextDisplayedAsExpected(bookRelatedItems.get(5),isDisplayed)
+                .withFailMessage("ISBN-10 Info is not displayed");
+        verifyTextDisplayedAsExpected(bookRelatedItems.get(6),isDisplayed)
+                .withFailMessage("ISBN-13 Info is not displayed");
+        verifyTextDisplayedAsExpected(bookRelatedItems.get(7),isDisplayed)
+                .withFailMessage("Reading age Info is not displayed");
+        verifyTextDisplayedAsExpected(bookRelatedItems.get(8),isDisplayed)
+                .withFailMessage("Dimensions Info is not displayed");
         
         
-        HarryPotterPage hp = new HarryPotterPage();
-        //   Driver.get().get(hp.selectBoxEndPoint);
-        
-        // validating the author
-        Assert.assertEquals("author name is not correct","J.K. Rowling", hp.authorNameTag.getText());
-        
-        Thread.sleep(5000);
-        // validating the book
-    
-        Assert.assertEquals("age group not matched","9 - 11 years", hp.readingAge.getText());
-        Assert.assertEquals("book page is not correct","352 pages", hp.printLength.getText());
-        
+
     }
     
-    @Then("Check if Book is available in the format of an {string}?")
-    public void checkIfBookIsAvailableInTheFormatOfAn(String typeEdition) {
-        
-        HarryPotterPage hp = new HarryPotterPage();
-//        Driver.get().get(hp.selectBoxEndPoint);
-        // all available formats
-        BrowserUtils.hover(hp.allEditionFormatsLink);
-        hp.allEditionFormatsLink.click();
-        List<String> editionFormats = BrowserUtils.getElementsText(hp.allEditionFormats);
-        Assert.assertEquals("Kindle Edition is not available", "Kindle Edition", editionFormats.get(1));
-        
-        
-    }
-    
-    @And("Select the book and {string}")
-    public void selectTheBookAnd(String arg0) {
-        HarryPotterPage hp = new HarryPotterPage();
-//        Driver.get().get(hp.selectBoxEndPoint);
+    @And("Select the book and proceed towards Check Out")
+    public void selectTheBookAnd() {
         
         // navigate to proceed to checkout
-        Utils.moveToElement(hp.selectTheBook).click();
-        Utils.moveToElement(hp.addTheBasket).click();
-        Utils.moveToElement(hp.proceedToCheckout).click();
+        moveToElement(addToCartButton).click();
+        moveToElement(proceedToCheckout).click();
         
         
     }
@@ -116,27 +103,35 @@ public class AmazonSteps {
     @Then("Select Create Your Amazon Account if user do not have an account")
     public void SelectCreateYourAmazonAccountIfUserDoNotHaveAnAccount() {
         
-        HarryPotterPage hp = new HarryPotterPage();
-//        Driver.get().get(hp.createAccountEndpoint);
-        
         // create the account button
-        Utils.moveToElement(hp.createYourAccount).click();
+        moveToElement(createYourAccount).click();
     }
     
     @And("verify all fields available on Create Your Amazon Account page")
-    public void VerifyAllFieldsAvailableOnCreateYourAmazonAccountPage() throws InterruptedException {
+    public void VerifyAllFieldsAvailableOnCreateYourAmazonAccountPage() {
         
         
-        HarryPotterPage hp = new HarryPotterPage();
-//        Driver.get().get(hp.createAccountEndpoint);
         
         // verifying input tags on the create account page
         
-        Utils.verifyText(hp.creatAccountLabels.get(0), "Your name");
-        Utils.verifyText(hp.creatAccountLabels.get(1), "Email");
-        Utils.verifyText(hp.creatAccountLabels.get(2), "Password");
-        Utils.verifyText(hp.creatAccountLabels.get(3), "Re-enter password");
+        verifyTextDisplayedAsExpected(creatAccountLabels.get(0),isDisplayed)
+                .withFailMessage( "Your name is not displayed");
+        verifyTextDisplayedAsExpected(creatAccountLabels.get(1),isDisplayed)
+                .withFailMessage( "Your email is not displayed");
+        verifyTextDisplayedAsExpected(creatAccountLabels.get(2),isDisplayed)
+                .withFailMessage( "Your Password  is not displayed");
+        verifyTextDisplayedAsExpected(creatAccountLabels.get(3),isDisplayed)
+                .withFailMessage( "Re-enter password  is not displayed");
+    
         
+        // verifying checkboxes on the create account page
+        typeStringAndVerify("userName", customerNameBox);
+        typeStringAndVerify("e___@email.com", emailBox);
+        typeStringAndVerify("password1111", passwordBox);
+     
+        
+        verifyTextDisplayedAsExpected(realPersonMessage,isDisplayed)
+                .withFailMessage("Any message isn't shown up");
         
     }
 }

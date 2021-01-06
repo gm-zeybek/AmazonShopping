@@ -1,5 +1,6 @@
 package com.amazonShopping.utilities;
 
+import org.assertj.core.api.AbstractStringAssert;
 import org.junit.Assert;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
@@ -11,19 +12,87 @@ import org.openqa.selenium.support.ui.FluentWait;
 import org.openqa.selenium.support.ui.Select;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
-import java.time.Duration;
+import java.util.ArrayList;
 import java.util.List;
 
-public abstract class Utils {
+import static org.assertj.core.api.Assertions.assertThat;
+
+
+public interface Utils {
+    
+    
+    String isDisplayed = null;
+    
+    /**
+     * clicks the clickable webelement and waits for page loading
+     *
+     * @param clickItem
+     * @param pageloader
+     */
+    static void clickOnAndWaitForPageLoad(WebElement clickItem, WebElement pageloader) {
+        
+        clickItem.click();
+        waitFor()
+                .until(ExpectedConditions.visibilityOf(pageloader));
+        
+    }
     
     
     /**
-     * Checks or unchecks given checkbox
+     * navigates into predefinite url
+     *
+     * @param url
+     */
+    static void navigateUrl(String url) {
+        // navigating the url
+        Driver.get().get(ConfigurationReader.get(url));
+    }
+    
+    
+    /**
+     * accepts all cookies by clicking the acceptall button
+     *
+     * @param acceptCookiesElement
+     */
+    static void acceptCookies(WebElement acceptCookiesElement) {
+        
+        // accepting cookies
+        waitFor().until(ExpectedConditions.elementToBeClickable(acceptCookiesElement)).click();
+        
+    }
+    
+    /**
+     * maximizes the condition
+     */
+    static void maximizeWindow() {
+        // maximizes window
+        Driver.get().manage().window().maximize();
+        
+    }
+    
+    
+    /**
+         * verifies the given weblement for given conditions accepting condition as a string
+     *
+     * @param element
+     * @return
+     */
+    static AbstractStringAssert<?> verifyTextDisplayedAsExpected(WebElement element, String condition) {
+        
+        
+        return assertThat(element + "." + condition + "()");
+        
+        
+    }
+    
+    
+    /**
+     * checks or unchecks given checkbox
      *
      * @param element
      * @param check
      */
-    public static void selectCheckBox(WebElement element, boolean check) {
+    static void selectCheckBox(WebElement element, boolean check) {
         if (check) {
             if (!element.isSelected()) {
                 element.click();
@@ -35,36 +104,29 @@ public abstract class Utils {
         }
     }
     
-    
     /**
      * wait method
+     * uses fluentwait wait
+     *
      * @return
      */
     public static FluentWait<WebDriver> waitFor() {
-       
-        return new WebDriverWait(Driver.get(), 20);
-    }
-    
-    
-    /**
-     * taking webelement as an argument and return clickable element
-     * @param element
-     * @return
-     */
-    public static WebElement getElementWithFluentWait(WebElement element) {
-        return Utils.waitFor().withTimeout(Duration.ofSeconds(5)).
-                until(ExpectedConditions.elementToBeClickable(element));
         
+        return new WebDriverWait(Driver.get(), 5);
     }
+    
     
     /**
      * moveto method taking webelement and returning Actions instance
+     *
      * @param element
      * @return
      */
-    public static Actions moveToElement(WebElement element) {
-        return new Actions(Driver.get()).
-                moveToElement(element);
+    static WebElement moveToElement(WebElement element) {
+        
+        new Actions(Driver.get()).
+                moveToElement(element).build();
+        return waitFor().until(ExpectedConditions.visibilityOf(element));
         
     }
     
@@ -72,10 +134,11 @@ public abstract class Utils {
     /**
      * Selecting dropdown by given word and verifying selected word
      * selected or not
+     *
      * @param selectElement
      * @param category
      */
-    public static void verifyThatCategorySelected(WebElement selectElement, String category) {
+    static void verifyThatCategorySelected(WebElement selectElement, String category) {
         Select select = new Select(selectElement);
         select.selectByVisibleText(category);
         String selectedCategory = select.getFirstSelectedOption().getText();
@@ -84,31 +147,76 @@ public abstract class Utils {
     }
     
     
-    public static void verifyText(WebElement element, String textToBeVerified) {
+    /**
+     * verifies the retrieving text is as expected
+     * @param element
+     * @param textToBeVerified
+     */
+    static void verifyText(WebElement element, String textToBeVerified) {
         
-        
-        Assert.assertEquals(textToBeVerified + " not equal", element.getText(), textToBeVerified);
+        assertThat(element.getText()).isEqualTo(textToBeVerified).withFailMessage("%s not equal",textToBeVerified);
         
     }
     
-    public static void verifyTextEntered(WebElement element, String textToBeVerified) {
+    
+    /**
+     * type the string into the box and verifies the string as expected
+     * @param string
+     * @param element
+     */
+    static void typeStringAndVerify(String string, WebElement element) {
         
-        // waitFor().until(ExpectedConditions.elementSelectionStateToBe(element,true));
+        // waiting for page elements visible
         
-        element.sendKeys(textToBeVerified, Keys.ENTER);
-        try {
-            Thread.sleep(3000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
+        new WebDriverWait(Driver.get(), 20)
+                .until(ExpectedConditions.visibilityOf(element));
+        
+        // filtering
+        element.sendKeys(Keys.CLEAR, string, Keys.ENTER);
+        
+        // Assert that searchbox contains the sought String
+        assertThat(element.getText().contains(string))
+                .withFailMessage("resource box doesn't contain string %s", string);
+        
+    }
+    
+    /**
+     * return a list of string from a list of elements
+     *
+     * @param list of webelements
+     * @return list of string
+     */
+    static List<String> getElementsText(List<WebElement> list) {
+        List<String> elemTexts = new ArrayList<>();
+        
+        for (WebElement el : list) {
+            elemTexts.add(el.getText());
         }
         
+        return elemTexts;
+    }
+    
+    /**
+     * Extracts text from list of elements matching the provided locator into new List<String>
+     *
+     * @param locator
+     * @return list of strings
+     */
+    static List<String> getElementsText(By locator) {
         
-        Assert.assertEquals(textToBeVerified + " not equal", element.getText(), textToBeVerified);
+        List<WebElement> elems = Driver.get().findElements(locator);
+        List<String> elemTexts = new ArrayList<>();
         
+        for (WebElement el : elems) {
+            elemTexts.add(el.getText());
+        }
+        return elemTexts;
     }
     
     
-    public static WebElement getTheLink(String linkText) {
+    
+    
+    static WebElement getTheLink(String linkText) {
         try {
             return Driver.get().findElement(By.
                     xpath("/html/body//a[contains(translate(.,'ABCDEFGHIJKLMNOPQRSTUVWXYZ'," +
@@ -121,7 +229,7 @@ public abstract class Utils {
         
     }
     
-    public static WebElement getTheElement(String elementText) {
+    static WebElement getTheElement(String elementText) {
         try {
             
             return Driver.get().findElement(By.
@@ -134,7 +242,7 @@ public abstract class Utils {
         return null;
     }
     
-    public static WebElement getTheButton(String buttonText) {
+    static WebElement getTheButton(String buttonText) {
         
         try {
             
@@ -149,7 +257,7 @@ public abstract class Utils {
         
     }
     
-    public static WebElement getPartialText(String tag, String buttonText) {
+    static WebElement getPartialText(String tag, String buttonText) {
         
         try {
             
@@ -164,7 +272,7 @@ public abstract class Utils {
         
     }
     
-    public static WebElement getTextFromListElement(List<WebElement> webElements, String text) {
+    static WebElement getTextFromListElement(List<WebElement> webElements, String text) {
         
         try {
             
@@ -182,7 +290,6 @@ public abstract class Utils {
         }
         return null;
     }
-    
     
     
 }

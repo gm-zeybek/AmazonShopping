@@ -1,12 +1,13 @@
 package com.amazonShopping.pages;
 
 import com.amazonShopping.utilities.Driver;
+import com.amazonShopping.utilities.Utils;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.PageFactory;
 
 
-public class HomePage {
+public class HomePage extends HarryPotterPage implements Utils  {
     
     
     @FindBy(xpath = "//input[@id='twotabsearchtextbox']")
@@ -15,8 +16,8 @@ public class HomePage {
     @FindBy(xpath = "//*[@id='searchDropdownBox']")
     public WebElement selectDropdown;
     
-    @FindBy(xpath = "//*[@id='searchDropdownBox']//div")
-    public WebElement bookSelect;
+    @FindBy(css = "#sp-cc-accept")
+    public WebElement acceptAllCookies;
     
     @FindBy(css = ".a-aui_72554-c")
     public WebElement loaderMaskElement1;
