@@ -2,7 +2,7 @@
 
 
 
-MotorolaSolutions Group Web Page Testing Exercise / Instructions
+Web Page Testing Exercise / Instructions
 Codes and Tests Prepared by: Murat Zeybek
 
 - Build Tool: Maven 
